@@ -1,101 +1,198 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Login Lucu</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login App - Seventeen Edition</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            /* Latar belakang foto Seventeen */
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1628157588553-5eeea00af15c?q=80&w=2080&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-<style>
-body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial, sans-serif;
-}
+        .card {
+            background: rgba(255, 255, 255, 0.9); /* Transparan dikit biar estetik */
+            backdrop-filter: blur(10px);
+            width: 380px;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: pop 0.5s ease;
+        }
 
-.card {
-  background: white;
-  width: 360px;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-  text-align: center;
-}
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
-/* INPUT */
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
+        h2 { color: #333; margin-top: 0; }
+        p { color: #555; }
 
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #667eea;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 14px;
+        }
 
-/* LOGOUT TEXT MERAH */
-.logout {
-  margin-top: 15px;
-  color: red;
-  font-weight: bold;
-  background: none;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-/* ===== ANIMASI KUCING 🐱 ===== */
-.cat {
-  font-size: 60px;
-  position: fixed;
-  bottom: -100px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-}
+        .btn-login {
+            background: #6a6fd6;
+            color: white;
+            margin-top: 10px;
+        }
 
-.cat.show-login {
-  display: block;
-  animation: catLogin 1.2s ease forwards;
-}
+        .btn-login:hover { background: #5559b3; }
 
-.cat.show-logout {
-  display: block;
-  animation: catLogout 1.2s ease forwards;
-}
+        /* TOMBOL LOGOUT MERAH TULISAN PUTIH */
+        .btn-logout {
+            background-color: #ff0000;
+            color: #ffffff;
+            margin-top: 20px;
+        }
 
-@keyframes catLogin {
-  0% { bottom: -100px; }
-  50% { bottom: 120px; }
-  100% { bottom: 90px; }
-}
+        .btn-logout:hover { background-color: #cc0000; }
 
-@keyframes catLogout {
-  0% { bottom: 90px; }
-  100% { bottom: -120px; }
-}
-</style>
+        .hidden { display: none; }
+        .user-box { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 15px; 
+            border-left: 5px solid #6a6fd6;
+        }
+        strong { color: #6a6fd6; text-transform: capitalize; font-size: 1.2em; }
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div class="card" id="loginBox">
-  <h2>Login</h2>
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="app.login()">Login</button>
-</div>
+    <div id="view-login" class="card">
+        <h2>Carat Login</h2>
+        <p>Masuk untuk melihat profil member</p>
+        <input type="text" id="inp-user" placeholder="Username">
+        <input type="password" id="inp-pass" placeholder="Password">
+        <button id="btn-do-login" class="btn-login">LOGIN</button>
+    </div>
 
-<!-- USER -->
-<div class="card" id="userBox" style="display:none;">
-  <h2>Info User</h2>
-  <
+    <div id="view-dash" class="card hidden">
+        <h2>Info Halaman User</h2>
+        <div class="user-box">
+            Halo, <strong id="name-tag"></strong>!
+        </div>
+        <p>Say the name, SEVENTEEN!</p>
+        <button id="btn-do-logout" class="btn-logout">LOGOUT</button>
+    </div>
+
+    <script>
+        // Data Set JSON
+        const dataUser = [
+            { "username": "scoups", "password": "1234" },
+            { "username": "mingyu", "password": "567" },
+            { "username": "woozi", "password": "1122" }
+        ];
+
+        // Class OOP
+        class SeventeenAuth {
+            constructor() {
+                this.dbKey = 'svt_db';
+                this.sessKey = 'svt_session';
+                this.initDB();
+                this.getElements();
+                this.setEvents();
+                this.checkStatus();
+            }
+
+            initDB() {
+                if (!localStorage.getItem(this.dbKey)) {
+                    localStorage.setItem(this.dbKey, JSON.stringify(dataUser));
+                }
+            }
+
+            getElements() {
+                this.pageLogin = document.getElementById('view-login');
+                this.pageDash = document.getElementById('view-dash');
+                this.inUser = document.getElementById('inp-user');
+                this.inPass = document.getElementById('inp-pass');
+                this.labelUser = document.getElementById('name-tag');
+                this.btnLogin = document.getElementById('btn-do-login');
+                this.btnLogout = document.getElementById('btn-do-logout');
+            }
+
+            setEvents() {
+                this.btnLogin.onclick = () => this.handleLogin();
+                this.btnLogout.onclick = () => this.handleLogout();
+            }
+
+            handleLogin() {
+                const u = this.inUser.value.trim().toLowerCase();
+                const p = this.inPass.value;
+
+                if (u.length < 3) {
+                    alert("Username harus minimal 3 karakter!");
+                    return;
+                }
+
+                const users = JSON.parse(localStorage.getItem(this.dbKey));
+                const userExist = users.find(x => x.username === u && x.password === p);
+
+                if (userExist) {
+                    localStorage.setItem(this.sessKey, u);
+                    this.updateDisplay(u);
+                } else {
+                    alert("salah login");
+                }
+            }
+
+            handleLogout() {
+                localStorage.removeItem(this.sessKey);
+                this.updateDisplay(null);
+            }
+
+            checkStatus() {
+                const s = localStorage.getItem(this.sessKey);
+                this.updateDisplay(s);
+            }
+
+            updateDisplay(user) {
+                if (user) {
+                    this.pageLogin.classList.add('hidden');
+                    this.pageDash.classList.remove('hidden');
+                    this.labelUser.innerText = user;
+                } else {
+                    this.pageLogin.classList.remove('hidden');
+                    this.pageDash.classList.add('hidden');
+                    this.inUser.value = "";
+                    this.inPass.value = "";
+                }
+            }
+        }
+
+        // Run App
+        const app = new SeventeenAuth();
+    </script>
+</body>
+</html>
