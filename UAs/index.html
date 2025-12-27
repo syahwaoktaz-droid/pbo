@@ -1,79 +1,176 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Login App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login App SVT Edition</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg,#6a6fd6,#7b5fc6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-<style>
-* {
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+        .card {
+            background: white;
+            width: 400px;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
 
-/* ===== BACKGROUND ===== */
-body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg,#6a6fd6,#7b5fc6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* ===== CARD ===== */
-.card {
-  background: white;
-  width: 420px;
-  padding: 35px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  text-align: center;
-}
+        h2 { color: #333; margin-bottom: 20px; }
+        p { color: #666; margin-bottom: 20px; }
 
-/* ===== TEXT ===== */
-h2 {
-  margin-bottom: 10px;
-  color: #222;
-}
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
 
-p {
-  color: #333;
-  margin-bottom: 25px;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #6a6fd6;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
 
-/* ===== INPUT ===== */
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
+        button:hover { opacity: 0.9; }
 
-/* ===== BUTTON ===== */
-button {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg,#6a6fd6,#7b5fc6);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
+        /* Tombol Logout Merah & Biru */
+        .btn-logout {
+            background: linear-gradient(to right, #ff416c, #3f5efb);
+            margin-top: 20px;
+        }
 
-/* ===== LOGOUT TEXT MERAH ===== */
-.logout {
-  margin-top: 20px;
-  background: linear-gradient(135deg,#6a6fd6,#7b5fc6); /* tetap ungu */
-  color: red;              /* TEKS MERAH */
-  font-weight: bold;
-}
+        .hidden { display: none; }
+        .user-info { color: #555; font-size: 1.1em; }
+        strong { color: #7b5fc6; }
+    </style>
+</head>
+<body>
 
-/* ===== ANIMASI HALUS ===== */
-.card {
-  animation: fade 0.8s ease;
-}
+    <div id="login-section" class="card">
+        <h2>Login App</h2>
+        <p>Silakan masuk ke akun Anda</p>
+        <input type="text" id="username" placeholder="Username (Min. 3 karakter)">
+        <input type="password" id="password" placeholder="Password">
+        <button id="btn-login">Login</button>
+    </div>
 
-@keyframes fade {
-  fro
+    <div id="dashboard-section" class="card hidden">
+        <h2>Info Halaman User</h2>
+        <p class="user-info">Halo, <strong id="display-user"></strong>!</p>
+        <p>Selamat datang kembali di sistem kami.</p>
+        <button id="btn-logout" class="btn-logout">Logout</button>
+    </div>
+
+    <script>
+        // Data Set (JSON) sesuai permintaan
+        const userData = [
+            { "username": "scoups", "password": "1234" },
+            { "username": "mingyu", "password": "567" },
+            { "username": "woozi", "password": "1122" }
+        ];
+
+        class AuthApp {
+            constructor() {
+                this.setupStorage();
+                this.initElements();
+                this.initEvents();
+                this.checkAuth();
+            }
+
+            // Simpan data user ke LocalStorage jika belum ada
+            setupStorage() {
+                if (!localStorage.getItem('db_users')) {
+                    localStorage.setItem('db_users', JSON.stringify(userData));
+                }
+            }
+
+            initElements() {
+                this.loginView = document.getElementById('login-section');
+                this.dashView = document.getElementById('dashboard-section');
+                this.userInp = document.getElementById('username');
+                this.passInp = document.getElementById('password');
+                this.userLabel = document.getElementById('display-user');
+                this.loginBtn = document.getElementById('btn-login');
+                this.logoutBtn = document.getElementById('btn-logout');
+            }
+
+            initEvents() {
+                this.loginBtn.onclick = () => this.doLogin();
+                this.logoutBtn.onclick = () => this.doLogout();
+            }
+
+            doLogin() {
+                const u = this.userInp.value.trim();
+                const p = this.passInp.value;
+
+                // Validasi minimal 3 karakter
+                if (u.length < 3) {
+                    alert("Username harus minimal 3 karakter!");
+                    return;
+                }
+
+                const users = JSON.parse(localStorage.getItem('db_users'));
+                const match = users.find(user => user.username === u && user.password === p);
+
+                if (match) {
+                    localStorage.setItem('active_session', u);
+                    this.renderUI(u);
+                } else {
+                    alert("salah login");
+                }
+            }
+
+            doLogout() {
+                localStorage.removeItem('active_session');
+                this.renderUI(null);
+            }
+
+            checkAuth() {
+                const session = localStorage.getItem('active_session');
+                this.renderUI(session);
+            }
+
+            renderUI(session) {
+                if (session) {
+                    this.loginView.classList.add('hidden');
+                    this.dashView.classList.remove('hidden');
+                    this.userLabel.innerText = session;
+                } else {
+                    this.loginView.classList.remove('hidden');
+                    this.dashView.classList.add('hidden');
+                    this.userInp.value = "";
+                    this.passInp.value = "";
+                }
+            }
+        }
+
+        // Jalankan aplikasi
+        const app = new AuthApp();
+    </script>
+</body>
+</html>
