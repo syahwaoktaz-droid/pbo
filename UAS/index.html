@@ -1,1 +1,102 @@
-Syahwa Oktazilla
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Aplikasi Login OOP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      width: 300px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+
+    .user-info {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box" id="loginBox">
+  <h3>Login</h3>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="app.login()">Login</button>
+</div>
+
+<div class="box user-info" id="userBox" style="display:none;">
+  <h3>Info User</h3>
+  <p id="info"></p>
+  <button onclick="app.logout()">Logout</button>
+</div>
+
+<script>
+class LoginApp {
+  constructor() {
+    this.initData();
+  }
+
+  initData() {
+    if (!localStorage.getItem("users")) {
+      const users = [
+        { username: "scoups", password: "080895" },
+        { username: "mingyu", password: "160497" },
+        { username: "woozi", password: "221196" }
+      ];
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+  }
+
+  login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const users = JSON.parse(localStorage.getItem("users"));
+
+    const user = users.find(
+      u => u.username === username && u.password === password
+    );
+
+    if (!user) {
+      alert("salah login");
+    } else {
+      this.showUser(user);
+    }
+  }
+
+  showUser(user) {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("userBox").style.display = "block";
+    document.getElementById("info").innerText =
+      "Selamat datang, " + user.username;
+  }
+
+  logout() {
+    document.getElementById("loginBox").style.display = "block";
+    document.getElementById("userBox").style.display = "none";
+  }
+}
+
+const app = new LoginApp();
+</script>
+
+</body>
+</html>
+
