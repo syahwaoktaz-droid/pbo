@@ -2,10 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Login App Final</title>
+<title>Login Lucu</title>
 
 <style>
-/* ================== LIGHT MODE ================== */
 body {
   margin: 0;
   height: 100vh;
@@ -14,7 +13,6 @@ body {
   justify-content: center;
   align-items: center;
   font-family: Arial, sans-serif;
-  transition: 0.4s;
 }
 
 .card {
@@ -24,14 +22,9 @@ body {
   border-radius: 15px;
   box-shadow: 0 15px 30px rgba(0,0,0,0.3);
   text-align: center;
-  transition: 0.4s;
 }
 
-h2 {
-  margin-bottom: 20px;
-  color: #333;
-}
-
+/* INPUT */
 input {
   width: 100%;
   padding: 12px;
@@ -49,182 +42,60 @@ button {
   color: white;
   font-size: 16px;
   cursor: pointer;
-  margin-top: 10px;
 }
 
-.toggle {
-  margin-top: 15px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #555;
-}
-
-/* ================== DARK MODE ================== */
-body.dark {
-  background: linear-gradient(135deg,#000000,#1a1a1a);
-}
-
-body.dark .card {
-  background: #121212;
-  color: white;
-  box-shadow: 0 0 25px #00e5ff;
-}
-
-body.dark h2 {
-  color: #00e5ff;
-}
-
-body.dark input {
-  background: #222;
-  color: white;
-  border: 1px solid #555;
-}
-
-body.dark button {
-  background: linear-gradient(135deg,#00e5ff,#0072ff);
-}
-
-body.dark .toggle {
-  color: #00e5ff;
-}
-
-/* ================== LOGOUT BUTTON ================== */
+/* LOGOUT TEXT MERAH */
 .logout {
-  background: #e74c3c !important;
+  margin-top: 15px;
+  color: red;
+  font-weight: bold;
+  background: none;
 }
 
-.logout:hover {
-  background: #c0392b !important;
-}
-
-body.dark .logout {
-  background: linear-gradient(135deg,#ff4b2b,#ff416c) !important;
-}
-
-/* ================== TOAST ================== */
-.toast {
+/* ===== ANIMASI KUCING 🐱 ===== */
+.cat {
+  font-size: 60px;
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: white;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
   display: none;
 }
 
-.toast.error { background: red; }
-.toast.success { background: green; }
-
-/* ================== LOGOUT ANIMATION ================== */
-.fade-out {
-  animation: keluar 0.6s forwards;
+.cat.show-login {
+  display: block;
+  animation: catLogin 1.2s ease forwards;
 }
 
-@keyframes keluar {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(30px);
-  }
+.cat.show-logout {
+  display: block;
+  animation: catLogout 1.2s ease forwards;
+}
+
+@keyframes catLogin {
+  0% { bottom: -100px; }
+  50% { bottom: 120px; }
+  100% { bottom: 90px; }
+}
+
+@keyframes catLogout {
+  0% { bottom: 90px; }
+  100% { bottom: -120px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================== LOGIN ================== -->
+<!-- LOGIN -->
 <div class="card" id="loginBox">
-  <h2>LOGIN</h2>
+  <h2>Login</h2>
   <input type="text" id="username" placeholder="Username">
   <input type="password" id="password" placeholder="Password">
-  <button onclick="app.login()">LOGIN</button>
-  <div class="toggle" onclick="app.toggleMode()">🌙 DARK / LIGHT</div>
+  <button onclick="app.login()">Login</button>
 </div>
 
-<!-- ================== USER INFO ================== -->
+<!-- USER -->
 <div class="card" id="userBox" style="display:none;">
-  <h2>INFO USER</h2>
-  <p id="info"></p>
-  <button class="logout" onclick="app.confirmLogout()">LOGOUT</button>
-</div>
-
-<!-- ================== TOAST ================== -->
-<div class="toast" id="toast"></div>
-
-<script>
-class LoginApp {
-  constructor() {
-    this.setUsers();
-  }
-
-  setUsers() {
-    const users = [
-      { username: "scoups", password: "080895" },
-      { username: "mingyu", password: "160497" },
-      { username: "woozi",  password: "221196" }
-    ];
-    localStorage.setItem("users", JSON.stringify(users));
-  }
-
-  login() {
-    const u = username.value;
-    const p = password.value;
-    const users = JSON.parse(localStorage.getItem("users"));
-
-    const user = users.find(
-      x => x.username === u && x.password === p
-    );
-
-    if (!user) {
-      this.toast("❌ Salah login", "error");
-    } else {
-      this.toast("✅ Login berhasil", "success");
-      setTimeout(() => {
-        loginBox.style.display = "none";
-        userBox.style.display = "block";
-        info.innerText = "Selamat datang, " + user.username + " 🎉";
-      }, 800);
-    }
-  }
-
-  confirmLogout() {
-    if (confirm("Yakin ingin logout?")) {
-      this.logoutAnimasi();
-    }
-  }
-
-  logoutAnimasi() {
-    userBox.classList.add("fade-out");
-    setTimeout(() => {
-      userBox.classList.remove("fade-out");
-      userBox.style.display = "none";
-      loginBox.style.display = "block";
-      this.toast("👋 Berhasil logout", "success");
-    }, 600);
-  }
-
-  toggleMode() {
-    document.body.classList.toggle("dark");
-    if (document.body.classList.contains("dark")) {
-      this.toast("🌙 Dark mode aktif", "success");
-    } else {
-      this.toast("☀️ Light mode aktif", "success");
-    }
-  }
-
-  toast(msg, type) {
-    toast.innerText = msg;
-    toast.className = "toast " + type;
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 2000);
-  }
-}
-
-const app = new LoginApp();
-</script>
-
-</body>
-</html>
+  <h2>Info User</h2>
+  <
