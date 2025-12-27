@@ -5,49 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login App - Seventeen Edition</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body {
             margin: 0;
             height: 100vh;
-            /* Latar belakang foto Seventeen */
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                        url('https://images.unsplash.com/photo-1628157588553-5eeea00af15c?q=80&w=2080&auto=format&fit=crop'); 
+            /* Latar Belakang menggunakan foto Seventeen */
+            /* Tukar 'seventeen.jpg' jika anda mempunyai fail sendiri */
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://i.pinimg.com/originals/34/93/2a/34932a76059d4375b430c51d6c342f56.jpg'); 
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.9); /* Transparan dikit biar estetik */
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
             width: 380px;
             padding: 40px;
             border-radius: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             text-align: center;
-            animation: pop 0.5s ease;
+            animation: fadeIn 0.6s ease-in-out;
         }
 
-        @keyframes pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 { color: #333; margin-top: 0; }
-        p { color: #555; }
+        h2 { color: #333; margin-top: 0; margin-bottom: 10px; }
+        p { color: #555; margin-bottom: 25px; }
 
         input {
             width: 100%;
             padding: 14px;
             margin: 10px 0;
             border-radius: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             outline: none;
-            font-size: 14px;
+            transition: 0.3s;
         }
+
+        input:focus { border-color: #6a6fd6; }
 
         button {
             width: 100%;
@@ -61,138 +65,137 @@
         }
 
         .btn-login {
-            background: #6a6fd6;
+            background-color: #6a6fd6;
             color: white;
             margin-top: 10px;
         }
 
-        .btn-login:hover { background: #5559b3; }
-
-        /* TOMBOL LOGOUT MERAH TULISAN PUTIH */
+        /* TOMBOL LOGOUT: MERAH, TULISAN: PUTIH */
         .btn-logout {
             background-color: #ff0000;
             color: #ffffff;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .btn-logout:hover { background-color: #cc0000; }
 
         .hidden { display: none; }
-        .user-box { 
-            margin: 20px 0; 
+        .welcome-box { 
+            margin: 25px 0; 
             padding: 20px; 
-            background: #f8f9fa; 
+            background: #ffffff; 
             border-radius: 15px; 
-            border-left: 5px solid #6a6fd6;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
         }
-        strong { color: #6a6fd6; text-transform: capitalize; font-size: 1.2em; }
+        strong { color: #7b5fc6; text-transform: capitalize; font-size: 1.3em; }
     </style>
 </head>
 <body>
 
-    <div id="view-login" class="card">
+    <div id="login-view" class="card">
         <h2>Carat Login</h2>
-        <p>Masuk untuk melihat profil member</p>
-        <input type="text" id="inp-user" placeholder="Username">
-        <input type="password" id="inp-pass" placeholder="Password">
-        <button id="btn-do-login" class="btn-login">LOGIN</button>
+        <p>Say the name, SEVENTEEN!</p>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="do-login" class="btn-login">Login</button>
     </div>
 
-    <div id="view-dash" class="card hidden">
+    <div id="user-view" class="card hidden">
         <h2>Info Halaman User</h2>
-        <div class="user-box">
-            Halo, <strong id="name-tag"></strong>!
+        <div class="welcome-box">
+            Halo, <strong id="display-name"></strong>!
         </div>
-        <p>Say the name, SEVENTEEN!</p>
-        <button id="btn-do-logout" class="btn-logout">LOGOUT</button>
+        <p>Anda telah berjaya log masuk.</p>
+        <button id="do-logout" class="btn-logout">LOGOUT</button>
     </div>
 
     <script>
-        // Data Set JSON
-        const dataUser = [
+        // Data Set (JSON)
+        const jsonUsers = [
             { "username": "scoups", "password": "1234" },
             { "username": "mingyu", "password": "567" },
             { "username": "woozi", "password": "1122" }
         ];
 
-        // Class OOP
-        class SeventeenAuth {
+        // OOP Class System
+        class SimpleAuth {
             constructor() {
                 this.dbKey = 'svt_db';
-                this.sessKey = 'svt_session';
-                this.initDB();
-                this.getElements();
-                this.setEvents();
-                this.checkStatus();
+                this.sessionKey = 'active_user';
+                this.setupDB();
+                this.bindUI();
+                this.bindActions();
+                this.start();
             }
 
-            initDB() {
+            setupDB() {
                 if (!localStorage.getItem(this.dbKey)) {
-                    localStorage.setItem(this.dbKey, JSON.stringify(dataUser));
+                    localStorage.setItem(this.dbKey, JSON.stringify(jsonUsers));
                 }
             }
 
-            getElements() {
-                this.pageLogin = document.getElementById('view-login');
-                this.pageDash = document.getElementById('view-dash');
-                this.inUser = document.getElementById('inp-user');
-                this.inPass = document.getElementById('inp-pass');
-                this.labelUser = document.getElementById('name-tag');
-                this.btnLogin = document.getElementById('btn-do-login');
-                this.btnLogout = document.getElementById('btn-do-logout');
+            bindUI() {
+                this.uiLogin = document.getElementById('login-view');
+                this.uiUser = document.getElementById('user-view');
+                this.inputUser = document.getElementById('username');
+                this.inputPass = document.getElementById('password');
+                this.labelUser = document.getElementById('display-name');
+                this.loginBtn = document.getElementById('do-login');
+                this.logoutBtn = document.getElementById('do-logout');
             }
 
-            setEvents() {
-                this.btnLogin.onclick = () => this.handleLogin();
-                this.btnLogout.onclick = () => this.handleLogout();
+            bindActions() {
+                this.loginBtn.onclick = () => this.loginProcess();
+                this.logoutBtn.onclick = () => this.logoutProcess();
             }
 
-            handleLogin() {
-                const u = this.inUser.value.trim().toLowerCase();
-                const p = this.inPass.value;
+            loginProcess() {
+                const u = this.inputUser.value.trim().toLowerCase();
+                const p = this.inputPass.value;
 
+                // Username min 3 karakter
                 if (u.length < 3) {
                     alert("Username harus minimal 3 karakter!");
                     return;
                 }
 
                 const users = JSON.parse(localStorage.getItem(this.dbKey));
-                const userExist = users.find(x => x.username === u && x.password === p);
+                const account = users.find(user => user.username === u && user.password === p);
 
-                if (userExist) {
-                    localStorage.setItem(this.sessKey, u);
-                    this.updateDisplay(u);
+                if (account) {
+                    localStorage.setItem(this.sessionKey, u);
+                    this.switchPage(u);
                 } else {
                     alert("salah login");
                 }
             }
 
-            handleLogout() {
-                localStorage.removeItem(this.sessKey);
-                this.updateDisplay(null);
+            logoutProcess() {
+                localStorage.removeItem(this.sessionKey);
+                this.switchPage(null);
             }
 
-            checkStatus() {
-                const s = localStorage.getItem(this.sessKey);
-                this.updateDisplay(s);
+            start() {
+                const session = localStorage.getItem(this.sessionKey);
+                this.switchPage(session);
             }
 
-            updateDisplay(user) {
+            switchPage(user) {
                 if (user) {
-                    this.pageLogin.classList.add('hidden');
-                    this.pageDash.classList.remove('hidden');
+                    this.uiLogin.classList.add('hidden');
+                    this.uiUser.classList.remove('hidden');
                     this.labelUser.innerText = user;
                 } else {
-                    this.pageLogin.classList.remove('hidden');
-                    this.pageDash.classList.add('hidden');
-                    this.inUser.value = "";
-                    this.inPass.value = "";
+                    this.uiLogin.classList.remove('hidden');
+                    this.uiUser.classList.add('hidden');
+                    this.inputUser.value = "";
+                    this.inputPass.value = "";
                 }
             }
         }
 
-        // Run App
-        const app = new SeventeenAuth();
+        // Jalankan
+        new SimpleAuth();
     </script>
 </body>
 </html>
