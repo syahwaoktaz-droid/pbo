@@ -1,205 +1,187 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Login Modern</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login App Seventeen</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg,#6a6fd6,#7b5fc6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-<style>
-:root {
-  --bg1:#667eea;
-  --bg2:#764ba2;
-  --card:#ffffff;
-  --text:#333;
-}
+        .card {
+            background: white;
+            width: 380px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
 
-.dark {
-  --bg1:#141E30;
-  --bg2:#243B55;
-  --card:#1e1e1e;
-  --text:#f2f2f2;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+        h2 { color: #333; margin-top: 0; }
+        p { color: #666; }
 
-body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg,var(--bg1),var(--bg2));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.5s;
-}
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
 
-.card {
-  background: var(--card);
-  color: var(--text);
-  width: 360px;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-  animation: fade 0.8s;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
+        .btn-login {
+            background-color: #6a6fd6;
+            color: white;
+            margin-top: 10px;
+        }
 
-.input-group {
-  position: relative;
-  margin-bottom: 15px;
-}
+        /* TOMBOL LOGOUT: MERAH, TULISAN: PUTIH */
+        .btn-logout {
+            background-color: #ff0000; /* MERAH */
+            color: #ffffff;           /* PUTIH */
+            margin-top: 20px;
+        }
 
-.input-group i {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  color: #888;
-}
+        .btn-logout:hover {
+            background-color: #cc0000; /* Merah agak gelap saat disentuh */
+        }
 
-input {
-  width: 100%;
-  padding: 12px 12px 12px 36px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-.toggle {
-  text-align: center;
-  margin-top: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: white;
-  display: none;
-  animation: slide 0.5s;
-}
-
-.toast.error { background:#e74c3c; }
-.toast.success { background:#2ecc71; }
-
-@keyframes fade {
-  from {opacity:0; transform:translateY(20px);}
-  to {opacity:1; transform:translateY(0);}
-}
-
-@keyframes slide {
-  from {transform:translateX(100%);}
-  to {transform:translateX(0);}
-}
-</style>
+        .hidden { display: none; }
+        .welcome-box { margin: 25px 0; padding: 15px; background: #f0f0f0; border-radius: 10px; }
+        strong { color: #7b5fc6; text-transform: capitalize; }
+    </style>
 </head>
-
 <body>
 
-<div class="card" id="loginBox">
-  <h2><i class="fa-solid fa-right-to-bracket"></i> Login</h2>
+    <div id="login-view" class="card">
+        <h2>Login App</h2>
+        <p>Silakan masuk ke akun Anda</p>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="do-login" class="btn-login">Login</button>
+    </div>
 
-  <div class="input-group">
-    <i class="fa-solid fa-user"></i>
-    <input type="text" id="username" placeholder="Username">
-  </div>
+    <div id="user-view" class="card hidden">
+        <h2>Info Halaman User</h2>
+        <div class="welcome-box">
+            Halo, <strong id="display-name"></strong>!
+        </div>
+        <p>Anda sedang berada di halaman dashboard.</p>
+        <button id="do-logout" class="btn-logout">LOGOUT</button>
+    </div>
 
-  <div class="input-group">
-    <i class="fa-solid fa-lock"></i>
-    <input type="password" id="password" placeholder="Password">
-  </div>
+    <script>
+        // Data Set (JSON)
+        const jsonUsers = [
+            { "username": "scoups", "password": "123" },
+            { "username": "mingyu", "password": "567" },
+            { "username": "woozi", "password": "112" }
+        ];
 
-  <button onclick="app.login()">Masuk</button>
-  <div class="toggle" onclick="app.toggleMode()">🌙 Dark / Light Mode</div>
-</div>
+        // OOP Class System
+        class SimpleAuth {
+            constructor() {
+                this.dbKey = 'app_db';
+                this.sessionKey = 'user_session';
+                this.setupDB();
+                this.bindUI();
+                this.bindActions();
+                this.start();
+            }
 
-<div class="card" id="userBox" style="display:none;">
-  <h2><i class="fa-solid fa-user-check"></i> Info User</h2>
-  <p id="info" style="text-align:center;"></p>
-  <button onclick="app.logout()">Logout</button>
-</div>
+            setupDB() {
+                if (!localStorage.getItem(this.dbKey)) {
+                    localStorage.setItem(this.dbKey, JSON.stringify(jsonUsers));
+                }
+            }
 
-<div class="toast" id="toast"></div>
+            bindUI() {
+                this.uiLogin = document.getElementById('login-view');
+                this.uiUser = document.getElementById('user-view');
+                this.inputUser = document.getElementById('username');
+                this.inputPass = document.getElementById('password');
+                this.labelUser = document.getElementById('display-name');
+                this.loginBtn = document.getElementById('do-login');
+                this.logoutBtn = document.getElementById('do-logout');
+            }
 
-<script>
-class LoginApp {
-  constructor() {
-    this.initData();
-  }
+            bindActions() {
+                this.loginBtn.onclick = () => this.loginProcess();
+                this.logoutBtn.onclick = () => this.logoutProcess();
+            }
 
-  initData() {
-    if (!localStorage.getItem("users")) {
-      const users = [
-        { username: "scoups", password: "080895" },
-        { username: "mingyu", password: "160497" },
-        { username: "woozi", password: "221196" }
-      ];
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-  }
+            loginProcess() {
+                const u = this.inputUser.value.trim().toLowerCase();
+                const p = this.inputPass.value;
 
-  login() {
-    const u = username.value;
-    const p = password.value;
-    const users = JSON.parse(localStorage.getItem("users"));
-    const user = users.find(x => x.username === u && x.password === p);
+                // Username 3 karakter
+                if (u.length < 3) {
+                    alert("Username harus minimal 3 karakter!");
+                    return;
+                }
 
-    if (!user) {
-      this.showToast("❌ Salah login", "error");
-    } else {
-      this.showToast("✅ Login berhasil", "success");
-      setTimeout(() => this.showUser(user), 800);
-    }
-  }
+                const users = JSON.parse(localStorage.getItem(this.dbKey));
+                const account = users.find(user => user.username === u && user.password === p);
 
-  showUser(user) {
-    loginBox.style.display = "none";
-    userBox.style.display = "block";
-    info.innerText = `Selamat datang, ${user.username} 🎉`;
-  }
+                if (account) {
+                    localStorage.setItem(this.sessionKey, u);
+                    this.switchPage(u);
+                } else {
+                    alert("salah login");
+                }
+            }
 
-  logout() {
-    userBox.style.display = "none";
-    loginBox.style.display = "block";
-  }
+            logoutProcess() {
+                localStorage.removeItem(this.sessionKey);
+                this.switchPage(null);
+            }
 
-  showToast(msg, type) {
-    toast.innerText = msg;
-    toast.className = "toast " + type;
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 2500);
-  }
+            start() {
+                const session = localStorage.getItem(this.sessionKey);
+                this.switchPage(session);
+            }
 
-  toggleMode() {
-    document.body.classList.toggle("dark");
-  }
-}
+            switchPage(user) {
+                if (user) {
+                    this.uiLogin.classList.add('hidden');
+                    this.uiUser.classList.remove('hidden');
+                    this.labelUser.innerText = user;
+                } else {
+                    this.uiLogin.classList.remove('hidden');
+                    this.uiUser.classList.add('hidden');
+                    this.inputUser.value = "";
+                    this.inputPass.value = "";
+                }
+            }
+        }
 
-const app = new LoginApp();
-</script>
-
+        // Jalankan
+        const app = new SimpleAuth();
+    </script>
 </body>
 </html>
